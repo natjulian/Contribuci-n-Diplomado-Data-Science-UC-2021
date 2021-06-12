@@ -262,9 +262,17 @@ system.time(fib2(30))
 #Seleccionar la función adecuada para leer las bases de datos.
 #utilizar purrr::map convenientemente para alcanzar lo deseado.
 
+dir_archivos<-list.files("Bases_Continentes", full.names = TRUE)
 
+df_paises<-map_df(dir_archivos, read_csv)
 
+list_paises<-map(dir_archivos, read_csv)
 
+names(list_paises)<-substr(dir_archivos, 19, nchar(dir_archivos)-4)
+
+list_paises$Africa
+
+list_paises$Asia
 
 
 #PREGUNTA 4)
