@@ -141,6 +141,15 @@ resultado_examen3(data)$Notas
 
 resultado_examen3(data)$Status
 
+
+system.time(resultado_examen1(data))
+
+system.time(resultado_examen2(data))
+
+system.time(resultado_examen3(data))
+
+
+
 ## Pregunta 1) :: Item b)
 
 #Evalúe la data.frame antes creada en la función creada, 
@@ -148,10 +157,17 @@ resultado_examen3(data)$Status
 
 
 
+resultado_examen3(data)$Status
 
 
+table(resultado_examen3(data)$Status[,2])
 
 
+ggplot(resultado_examen3(data)$Status, aes(resultado))+geom_bar()
+
+
+ggplot(resultado_examen3(data)$Status, aes(resultado))+
+  geom_bar(aes(y=(..count..)/sum(..count..)))+ylim(0,1)
 
 
 
@@ -170,8 +186,32 @@ resultado_examen3(data)$Status
 #la serie de Fibonacci. Sugerencia: crear una función con if/ else if 
 #que sea auto-recursiva y otra con un proceso condicional “while”.
 
+###FUNCIÓN AUTORECURSIVA EXPLÍCITA
+
+fib<-function(n){
+  
+  if(n==1){
+    return(0)
+  }
+  
+  else if (n==2){
+    return(1)
+  }
+  
+  else {
+    return(fib(n-1)+fib(n-2))
+  }
+
+}
+
+fib(4)
+
+fib(10)
+
+fib(100)
 
 
+### CON WHILE
 
 
 #Pregunta 2):: Item b)
