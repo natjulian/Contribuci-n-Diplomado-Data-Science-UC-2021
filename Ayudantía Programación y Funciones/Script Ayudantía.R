@@ -164,6 +164,7 @@ names(data)<-c("Nombre", "I1", "I2", "I3", "prom_laboratorio")
 
 
 
+
 #Pregunta 4):: Item c)
 
 #Interesa tener la misma información anterior para los departamentos pets, breakfast, 
