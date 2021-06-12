@@ -79,6 +79,9 @@ resultado_examen1<-function(df){
     }
   }
 
+  return(list("Notas"=df[,1:5], "Status"=df[, c(1, 7)]))
+  
+}
 
 
 
