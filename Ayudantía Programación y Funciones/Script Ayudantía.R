@@ -58,7 +58,26 @@ names(data)<-c("Nombre", "I1", "I2", "I3", "prom_laboratorio")
 #la función system.time().
 
 
-resultado_examen1
+resultado_examen1<-function(df){
+  
+  df$NP<-round(((df$I1+df$I2+df$I3)/3)*0.7+df$prom_laboratorio*0.3, 2)
+  df$resultado<-NA
+  
+  for(i in 1: nrow(df)){
+    
+    if((df$NP[i]>=5)&(df$I1[i]>=4)&(df$I2[i]>=4)&(df$I3[i]>=4)){
+      
+      df$resultado[i]<-"Aprueba sin examen"
+    }
+    
+    else if(df$NP[i]<3.95){
+      df$resultado[i]<-"Reprueba con opción a rendir examen"
+    }
+    
+    else{
+      df$resultado[i]<-"Rinde examen"
+    }
+  }
 
 
 
