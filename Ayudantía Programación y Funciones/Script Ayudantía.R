@@ -214,10 +214,33 @@ fib(100)
 ### CON WHILE
 
 
+fib2<-function(n){
+  valores<-c()
+  valores[1]<-0
+  valores[2]<-1
+  
+  i<-2
+  while(i<=n){
+    next_val<-sum(tail(valores, 2))
+    valores<-c(valores, next_val)
+    i<-i+1
+  }
+  return(valores[n])
+}
+
+fib2(4)
+
+fib2(10)
+
+
 #Pregunta 2):: Item b)
 #Compare los tiempos de demora de ejecución de ambas funciones utilizando 
 #la función system.time(). Explique por qué cree que se generan los 
 #resultados obtenidos.
+
+system.time(fib(30))
+
+system.time(fib2(30))
 
 
 
