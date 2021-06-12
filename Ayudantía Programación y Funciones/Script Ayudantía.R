@@ -382,4 +382,5 @@ map(seq_along(plots),
     })
 
 
-# Gracias por seguir hasta aquí! :D
+# Gracias por seguir hasta aquí! :D cualquier duda escribir 
+# najulian@mat.uc.cl. Buen finde!!
