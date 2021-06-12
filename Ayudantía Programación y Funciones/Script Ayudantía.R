@@ -294,10 +294,17 @@ list_paises$Asia
 #Cargue las bases de datos y realice los cruces necesarios para tener para cada pedido 
 #la información completa (características del producto y departamento a cargo de proveerlo).
 
+nombres<-list.files("Base_Instacart", full.names=TRUE)
 
+Datas<-map(nombres, read_csv)
 
+names(Datas)<-substr(nombres, 16, nchar(nombres)-4)
 
+Datas$departments
 
+Datas$order_products__train
+
+Datas$products
 
 
 
