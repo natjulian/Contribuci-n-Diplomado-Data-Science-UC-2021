@@ -243,6 +243,9 @@ system.time(fib(30))
 system.time(fib2(30))
 
 
+#Paquete microbenchmark muy util! Hace iteraciones de ejecución ver!
+
+
 
 #PREGUNTA 3)
 
