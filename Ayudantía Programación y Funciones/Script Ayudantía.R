@@ -22,6 +22,7 @@ nombres<-randomNames(50, ethnicity = 4) #Generador de nombres aleatorios hispán
 set.seed(2021) #Fija semilla 2021
 interrogaciones<-matrix(round(runif(150, min=1, max=7),1), ncol=3) #Crea una matriz con calificaciones aleatorias
 
+set.seed(2021) #Fija semilla 2021
 laboratorio<-round(runif(nrow(interrogaciones), min=4.5, max=7),1)
 
 data<-data.frame(nombres, interrogaciones, laboratorio)
@@ -46,6 +47,7 @@ names(data)<-c("Nombre", "I1", "I2", "I3", "prom_laboratorio")
 # - Si NP<3,95 el alumno reprueba con opción para rendir examen y subir la 
 # nota final del curso.
 # Todos los otros casos rinden examen.
+
 # En este contexto, sería de mucha utilidad tener una función que reciba 
 #un data.frame y entregue (en objetos separados) las calificaciones y 
 #el resultado de presentación al examen (Aprueba sin examen, Reprueba con opción a 
@@ -56,7 +58,7 @@ names(data)<-c("Nombre", "I1", "I2", "I3", "prom_laboratorio")
 #la función system.time().
 
 
-
+resultado_examen1
 
 
 
