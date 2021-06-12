@@ -123,8 +123,23 @@ resultado_examen2(data)$Status
 
 ###FORMA 3 CON DPLYR: 
 
-resultado_examen2<-function(df){
+resultado_examen3<-function(df){
+  
+  df<-df%>%
+      mutate(NP=round(((I1+I2+I3)/3)*0.7+prom_laboratorio*0.3, 2),
+             resultado=ifelse((NP>=5)&(I1>=4)&(I2>=4)&(I3>=4), 
+             "Aprueba sin examen", 
+             ifelse(NP<3.95, "Reprueba con opción de rendir examen", 
+                                          "Rinde examen")))
+  
+  return(list("Notas"=df[,1:5], "Status"=df[, c(1, 7)]))
+  
+}
 
+
+resultado_examen3(data)$Notas
+
+resultado_examen3(data)$Status
 
 ## Pregunta 1) :: Item b)
 
