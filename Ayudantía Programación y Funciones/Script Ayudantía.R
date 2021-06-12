@@ -84,7 +84,46 @@ resultado_examen1<-function(df){
 }
 
 
+resultado_examen1(data)$Notas
 
+resultado_examen1(data)$Status
+
+#### FORMA 2: UTILIZANDO APPLY
+
+resultado_examen2<-function(df){
+  
+    df$NP<-apply(df[,-1], MARGIN=1, FUN=function(x){
+    ((x[1]+x[2]+x[3])/3)*0.7+x[4]*0.3} )
+  
+  df$resultado<-NA
+  
+  for(i in 1: nrow(df)){
+    
+    if((df$NP[i]>=5)&(df$I1[i]>=4)&(df$I2[i]>=4)&(df$I3[i]>=4)){
+      
+      df$resultado[i]<-"Aprueba sin examen"
+    }
+    
+    else if(df$NP[i]<3.95){
+      df$resultado[i]<-"Reprueba con opción a rendir examen"
+    }
+    
+    else{
+      df$resultado[i]<-"Rinde examen"
+    }
+  }
+  
+  return(list("Notas"=df[,1:5], "Status"=df[, c(1, 7)]))
+  
+}
+
+resultado_examen2(data)$Notas
+
+resultado_examen2(data)$Status
+
+###FORMA 3 CON DPLYR: 
+
+resultado_examen2<-function(df){
 
 
 ## Pregunta 1) :: Item b)
