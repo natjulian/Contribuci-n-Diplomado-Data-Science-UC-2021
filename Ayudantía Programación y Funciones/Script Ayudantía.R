@@ -378,3 +378,5 @@ map(seq_along(plots),
       ggsave(sprintf("category %s.png", g), plots[[g]])
     })
 
+
+# Gracias por seguir hasta aquí! :D
