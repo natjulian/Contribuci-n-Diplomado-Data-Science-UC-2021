@@ -307,6 +307,12 @@ Datas$order_products__train
 Datas$products
 
 
+cruce<-Datas$order_products__train%>%
+  left_join(., Datas$products, by="product_id")%>%
+  left_join(., Datas$departments, by="department_id")
+  
+skim(cruce)$n_missing #información completa
+
 
 #Pregunta 4):: Item b)
 
@@ -315,9 +321,15 @@ Datas$products
 #cantidad de filas por id del pedido) y realice un histograma de la cantidad de 
 #productos por pedido.
 
+filtrofrozen<-cruce%>%
+              filter(department=="frozen")%>%
+              group_by(order_id)%>%
+              count()
 
 
-
+ggplot(filtrofrozen, aes(n))+
+  geom_histogram(bins=20)+
+  theme_minimal()
 
 
 
@@ -329,8 +341,28 @@ Datas$products
 
 
 
+datos<-map(c("pets", "breakfast", "frozen", "produce"),
+           function(d){
+             df<-cruce%>%
+               filter(department==d)%>%
+               group_by(order_id)%>%
+               count()
+             return(df)
+           })
 
 
+plots<-map(c("pets", "breakfast", "frozen", "produce"),
+           function(d){
+             df<-cruce%>%
+               filter(department==d)%>%
+               group_by(order_id)%>%
+               count()
+             return(ggplot(df, aes(n))+
+                      geom_histogram(bins=20)+
+                      theme_minimal()+
+                      ggtitle(paste("Products delivered per order in departament", d))
+             )
+           })
 
 
 
@@ -341,4 +373,8 @@ Datas$products
 
 
 
-  
+map(seq_along(plots),
+    function(g){
+      ggsave(sprintf("category %s.png", g), plots[[g]])
+    })
+
