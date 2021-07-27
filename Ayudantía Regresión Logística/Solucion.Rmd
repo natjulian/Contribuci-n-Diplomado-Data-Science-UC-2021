@@ -1,0 +1,445 @@
+---
+title: "Solución Ayudantía: Regresión Logística"
+author: "Natalie Julian - Paula Muñoz"
+date: ""
+output:
+  prettydoc::html_pretty:
+    theme: cayman
+    highlight: github
+---
+
+<div style="text-align: justify">
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### Ejercicio 1
+
+La base de datos <code>heart.csv</code> contiene información de distintos 
+pacientes y sus resultados de distintos exámenes cardiacos. Algunas de las 
+variables de esta base están descritas en la siguiente tabla:
+
+
+| Variable | Descripción |
+| -------- | :----------- |
+| `age` | Edad en años |
+| `sex` | Sexo de la persona (1=Hombre, 0=Mujer) |
+| `cp` | Tipo de dolor en el pecho (1= Angina típica, 2= Angina atípica, 3=No anginoso, 0=Asintomático) |
+| `fbs` | Glicemia en ayunas (1=Mayor a 120 mg/dl, 0=Menor a 120 mg/dl) |
+| `thall` | Presencia de defecto (1=Fijo, 2=Normal, 3=Reversible) |
+| ... | ... |
+
+Considerando a los pacientes de esta base de datos y las variables de la tabla 
+realice los siguientes pasos:
+
+#### **1.-** Separe la base de datos en dos grupos, 70% de los datos para generar una base de entrenamiento y el esto para la base de validación.
+
+```{r, message=FALSE}
+
+# Cargo la librería tidyverse para usar %>% sin problemas
+library(tidyverse)
+
+### Cargo la base
+corazon <- readr::read_csv("heart.csv")
+
+### Observo la base
+glimpse(corazon)
+
+### Cambio a factor las variables que voy a usar (cp, fbs y thall)
+corazon <- corazon %>% mutate(cp = factor(cp),
+                  thall = factor(thall),
+                  fbs = factor(fbs))
+
+### Chequeo que esté todo bien
+glimpse(corazon)
+
+# Luego separo la base en los dos grupos
+
+n_filas <- dim(corazon)[1]
+
+set.seed(2021)
+
+ind_train <-  sample(1:n_filas, size = n_filas*0.7)
+
+corazon_train = corazon[ind_train,] # Dejo sólo los de entrenamiento
+corazon_test = corazon[-ind_train,] # Quito los de entrenamiento
+
+```
+
+#### **2.-** Ajuste un modelo para predecir el sexo de los pacientes a partir del tipo de dolor en el pecho presentado, la medición de la glicemia en ayunas y la presencia de un defecto.
+
+```{r}
+# cp: tipo de dolor, fbs: glicemia en ayundas, thall: presencia de
+# defecto
+modelo <- glm(sex ~ cp + fbs + thall, data = corazon_train, 
+               family = binomial(link = "logit"))
+
+# Opción 1 para ver el modelo:
+
+summary(modelo)$coefficients
+
+# Opción 2:
+
+broom::tidy(modelo)
+```
+
+#### **3.-** Indique si el predictor es factor de riesgo, factor protector o no presenta efecto.
+
+La ventaja de usar <code>broom::tidy</code> es que nos entrega
+los datos del modelo como un tibble, lo que nos permite añadir una columna
+nueva con los resultados del OR respectivo.
+
+```{r}
+broom::tidy(modelo) %>% mutate(OR = exp(estimate))
+```
+
+Son factor de riesgo cp1, cp3, fbs1 y thall3. Mientras que factores protector
+son cp2 y thall2.
+
+#### **4.-** Genere la matriz de confusión para el modelo con un punto de corte de 0.7.
+
+```{r}
+y_reales <- corazon_test$sex
+probs <-  predict.glm(modelo, newdata = corazon_test, type = "response")
+
+corte <-  0.7
+
+y_predichos <- ifelse(probs >=corte, 1, 0)
+
+MLmetrics::ConfusionMatrix(y_pred = y_predichos, y_true = y_reales)
+```
+
+
+#### **5.-** Calcule la sensibilidad, la especificidad y la exactitud del modelo.
+
+```{r}
+MLmetrics::Sensitivity(y_pred = y_predichos, y_true = y_reales,
+                       positive = 1)
+```
+
+La sensibilidad nos muestra la proporción de los positivos capturados
+correctamente, en este caso es un valor un poco superior al 50%, por lo que 
+sería un poco mejor que tirar a una moneda.
+
+```{r}
+MLmetrics::Specificity(y_pred = y_predichos, y_true = y_reales,
+                       positive = 1)
+```
+
+La especificidad nos muestra la proporción de los negativos capturados
+correctamente, podemos apreciar que capturamos mejor los casos negativos 
+que los positivos.
+
+```{r}
+MLmetrics::Accuracy(y_pred = y_predichos, y_true = y_reales)
+```
+
+La exactitud es la proporción de los casos clasificados correctamente, 
+independiente de si son positivos o negativos. El valor es bastante bajo.
+
+#### **6.-** Calcule el estadístico F<sub>1</sub>.
+
+```{r}
+MLmetrics::F1_Score(y_pred = y_predichos, y_true = y_reales,
+                    positive = 1)
+
+```
+
+El estadístico F<sub>1</sub> expresa de manera conjunta la sensibilidad y 
+la precisión. El valor es también bastante bajo.
+
+
+#### **7.-** Analice la bondad del ajuste.
+
+Para analizar la bondad del ajuste usamos el Test Hosmer Lemeshow, donde la
+hipótesis nula H<sub>0</sub> es que no existe una diferencia entre los valores 
+observados y los pronósticados en ningún grupo (recordemos que este test 
+separa la muestra en diez grupos). Mientras que la hipótesis alternativa 
+H<sub>1</sub> indica que existe diferencia en al menos un grupo.
+
+```{r}
+DescTools::HosmerLemeshowTest(fit = probs, obs = y_reales)
+```
+
+Con el valor entregado no rechazamos la hipótesis nula, por lo que no habría 
+diferencia entre los valores observados y los pronósticados. Teniendo un 
+buen ajuste.
+
+
+#### **8.-** Analice el poder predictivo del modelo.
+
+Primero analizaremos la curva ROC.
+
+```{r}
+InformationValue::plotROC(actuals = y_reales, predictedScores = probs)
+```
+
+El valor del AUC es 0.6957, lo que corresponde a un valor aceptable. Recordemos
+que 
+
+|Valor AUC | Poder predictivo |
+|-------- | :----------- |
+| +90 | Sospechoso |
+| 75 - 90 | Buen Ajuste |
+| 60 - 75 | Aceptable |
+| 50 - 60 | Malo |
+| =50 | No sirve|
+
+Veamos ahora Kolmogorox- Smirnov.
+
+```{r}
+ROCit::ksplot(ROCit::rocit(score = probs, class = y_reales))$'KS stat'
+```
+
+El valor es 0.3824451, siendo un poder predictivo regular. Recordemos que
+
+|Kolmogorox- Smirnov| Poder predictivo |
+|-------- | :----------- |
+| +75 | Sospechoso |
+| 60 - 75 | Muy Bueno |
+| 40 - 60 | Bueno |
+| 20 - 40 | Regular |
+| <20 | Malo|
+
+Finalmente veremos el Índice de Gini.
+
+```{r}
+MLmetrics::Gini(y_true = y_reales, y_pred = probs)
+```
+
+Un valor cercano a cero nos indica que el modelo no es capaz de distinguir 
+entre los casos positivos o los negativos, mientras que uno cercano a uno 
+indica lo contrario, que sí hay poder predictivo. En este caso tenemos un valor 
+bastante intermedio, por lo que el poder predictivo sería regular.
+
+Podemos ver en este ejercicio que tomar sólo un indicador no es suficiente 
+para hacer un buen análisis. El Test de Hosmer Lemeshow nos indicó que el 
+ajuste era bueno, mientras que el poder predictor fue solamente regular o 
+aceptable. Por otro lado, el modelo distingue mejor los casos negativos que los 
+positivos. La utilidad de él, por lo tanto, dependerá de lo que se esté 
+buscando.
+
+Además cabe mencionar que en este ejercicio se indicó qué variables usar para el 
+modelo y el punto de corte. En el ejercicio 2 se verá cómo seleccionar las 
+variables mediante el método backward y cómo obtener un punto de corte 
+óptimo.
+
+### Ejercicio 2
+
+El paquete <code>ISLR</code> posee la base de datos <code>Default</code> que contiene información de la tarjeta de crédito de distintos clientes. Las variables de esta base están descritas en la siguiente tabla:
+
+| Variable | Descripción |
+| -------- | :----------- |
+| `default` | El cliente incumplió el pago de su cuota (1 = Sí, 0 = No) |
+| `student` | El cliente corresponde a un estudiante (1= Sí, 0 = No) |
+| `balance` | Saldo promedio que le queda al cliente en su tarjeta después de realizar el pago mensual |
+| `income` | Ingreso del cliente |
+
+```{r}
+
+library(ISLR)
+
+Default
+```
+
+#### **a)** Analice la asociación/relación de la variable respuesta  default con las variables:
+
+  + Student
+
+  + Balance
+
+  + Income
+  
+```{r}
+#Student
+
+#H_0: Son independientes
+#H_1: No son independientes
+
+chisq.test(Default$student, Default$default)
+
+
+mosaicplot(~student+default, data=Default, shade=TRUE)
+
+
+#Se rechaza la independencia entre las variables. Se esperaría que
+#student fuera una variable significativa en el modelo.
+
+#Balance 
+
+library(ggpubr)
+
+ggboxplot(Default, y="balance", x="default", fill="default")+  
+  xlab("")+ 
+  ylab("Balance")+
+  ggtitle("Balance del cliente post pago de cuota e incumplimiento de cuota.")+
+  theme_minimal()
+
+
+#Pareciera que a mayor monto en la cuenta post pago, 
+#más probable sería el incumplimiento
+
+anova(aov(balance~default, data=Default)) 
+
+#Diferencias entre ambos grupos son significativas
+
+#Income
+
+ggboxplot(Default, y="income", x="default", fill="default")+  
+  xlab("")+ 
+  ylab("income")+
+  ggtitle("Ingreso del cliente e incumplimiento de cuota.")+
+  theme_minimal()
+
+#El grupo de no incumplimiento parecería tener mayores ingresos 
+#(leve diferencia)
+
+anova(aov(income~default, data=Default)) 
+
+#Diferencia entre los grupos sería significativa al 5% 
+#pero está al borde!
+```
+
+  
+#### **b)** Realice un gráfico que muestre los puntos y el comportamiento de una regresión lineal usando como predictor a Balance. Realice lo mismo pero con un modelo de regresión logística. Explique por qué no sería correcto utilizar una regresión lineal, explique también la idea de la regresión logística. Comente.
+
+```{r}
+
+library(ggplot2)
+
+ggplot(data = Default, aes(x = balance, y = ifelse(default=="Yes", 1, 0))) +
+  geom_point(aes(color = as.factor(ifelse(default=="Yes", 1, 0))), shape = 1) + 
+  geom_smooth(method = "lm", color = "gray20", se = FALSE) +
+  theme_bw()  +
+  labs(title = "Regresión lineal default ~ balance",
+       y = "Default") +
+  theme(legend.position = "none")
+```
+
+De partida, la variable respuesta es dicotómica, no es numérica, no se 
+cumpliría el supuesto de que $Y|X \sim ~N()$, por lo tanto habría un serio problema de sustento teórico del modelo.
+
+Además, la regresión te puede dar cualquier cosa, valores sobre 1 y valores 
+#bajo 0, lo cual no tiene mucho sentido en este contexto.
+
+Finalmente, queda muy poco claro cómo interpretar los coeficientes en una
+regresión lineal, mirando el gráfico, ¿cómo se interpreta el intercepto?
+¿y la pendiente? ¿qué significa?
+
+```{r}
+ggplot(data = Default, aes(x = balance, y = ifelse(default=="Yes", 1, 0))) +
+  geom_point(aes(color = as.factor(ifelse(default=="Yes", 1, 0))), shape = 1) + 
+  geom_smooth(method = "glm",
+              method.args = list(family = "binomial"),
+              color = "gray20",
+              se = FALSE) +
+  labs(title = "Regresión logística default ~ balance",
+       y = "Default") +
+  theme_bw() +
+  theme(legend.position = "none")
+```
+
+La regresión logística entrega la probabilidad de ser 1 (éxito o evento),
+es necesario determinar el punto de corte, desde el cual se clasificará
+como 1 o 0. Al modelar probabilidades no se escapa de 1 y 0.
+
+#### **c)** Obtenga set de entrenamiento y prueba al 70%-30% respectivamente. Luego utilice backward para establecer el modelo final. Comente cuál sería la variable que menos aporta al modelo.
+
+```{r}
+#Se obtienen los set de entrenamiento y testeo:
+
+set.seed(2021)
+ind_train <- sample(1:nrow(Default), size = 0.7*nrow(Default), replace = FALSE)
+
+library(dplyr)
+
+data_train <- Default %>% 
+  slice(ind_train)
+
+data_test <- Default %>% 
+  slice(-ind_train)
+
+model.1<-glm(default ~ ., data = data_train, family = binomial(link = "logit")) 
+
+model.backward<-step(model.1, birection = "backward")
+
+model.backward$formula #no aparece income, sería la que menos aporta y por eso se quitó
+
+```
+
+
+#### **d)** Interprete los coeficientes del modelo anterior. ¿Qué variables se relacionan con una mayor probabilidad de incumplimiento?
+
+```{r}
+coef(model.backward) 
+```
+
+Ser estudiante se asocia con menor probabilidad de incumplimiento que no serlo a mayor balance mayor probabilidad de incumplimiento (visto en el gráfico).
+
+#### **e)** Con la función optimalCutoff() del paquete *InformationValue*, determine cuál es el punto de corte óptimo para predecir si un  cliente presentó incumplimiento o no. Evalúe la bondad de ajuste del modelo con el punto de corte encontrado, obtenga:
+
+  + Curva ROC: ¿En base al área de la curva ROC, usted diría que el modelo es bueno?
+  
+  + Matriz de confusión: Determine VP, VN, FN, FP y comente qué estaría pasando en este modelo.
+  
+  + Sensibilidad
+  
+  + Especificidad 
+  
+  + Precisión
+
+</div>
+
+```{r}
+library(InformationValue)
+
+
+predictedscores<-plogis(predict(model.backward, data_test)) #Lo que necesitamos es determinar desde qué valor se clasificará como 1 (tiene seguro complementario) o 0 (no tiene seguro complementario).
+
+corte <- optimalCutoff(data_test$default, predictedscores) #Punto de corte 
+
+corte
+
+#Se elige por default el punto de corte que optimiza la tasa de clasificación erronea (misclasserror) (ver help de la función)
+
+#Curva ROC
+plotROC(ifelse(data_test$default=="Yes", 1, 0), predictedscores)
+
+#El área está cerca de 1, por lo tanto, A PRIORI viendo sólo el área, 
+#posee un buen valor para esta métrica.
+
+#Matriz de confusión
+confusionMatrix(ifelse(data_test$default=="Yes", 1, 0), predictedscores, threshold = corte)
+#Lo que podemos ver es que hay demasiados casos negativos por sobre los positivos
+#el modelo podría entregar puros "No" y le achuntaría a casi todos los registros
+#hay que tener cuidado con los casos desbalanceados.
+
+#Sensibilidad: TP/(TP+FN)=97/(97+3)
+sensitivity(ifelse(data_test$default=="Yes", 1, 0), predictedscores, threshold = corte)
+##Indica de todos los positivos, cuántos fueron correctamente predichos
+#pero notar que son pocos los positivos!
+
+#Especificidad: TN/(TN+FP)=2062/(2062+838)
+specificity(ifelse(data_test$default=="Yes", 1, 0), predictedscores, threshold = corte)
+##Indica de todos los negativos, cuántos fueron correctamente predichos
+#Es menor la Especificidad, esto porque hubieron 838 casos donde el modelo
+#predijo que cliente incumple y no incumple.
+
+#Precisión: TP/(TP+FP)=97/(97+838)
+precision(ifelse(data_test$default=="Yes", 1, 0), predictedscores, threshold = corte)
+##Indica de todos los positivos predichos, cuántos realmente eran positivos
+
+#El modelo entrega demasiadas predicciones positivas de las que son!
+#Precisión muy baja.
+
+
+#Conclusión: Deben mirarse todas las métricas, no sólo una! Pues todas
+#nos ayudan a comprender el rendimiento del modelo a nivel más macro.
+
+
+#También se podría probar otros puntos de corte e ir viendo 
+#cómo cambian las métricas :D
+
+```
+
