@@ -240,7 +240,7 @@ El paquete <code>ISLR</code> posee la base de datos <code>Default</code> que con
 
 library(ISLR)
 
-Default
+head(Default, 10)
 ```
 
 #### **a)** Analice la asociación/relación de la variable respuesta  default con las variables:
@@ -401,7 +401,8 @@ corte <- optimalCutoff(data_test$default, predictedscores) #Punto de corte
 
 corte
 
-#Se elige por default el punto de corte que optimiza la tasa de clasificación erronea (misclasserror) (ver help de la función)
+#Se elige por default el punto de corte que optimiza la tasa de clasificación erronea
+#(misclasserror) (ver help de la función)
 
 #Curva ROC
 plotROC(ifelse(data_test$default=="Yes", 1, 0), predictedscores)
