@@ -5,6 +5,7 @@ library(highcharter)    # Para graficos interactivos
 library(DT)             # Para tablas
 library(dplyr)          # Para manipulacion de bases de datos
 library(dashboardthemes) #Para modificar el theme de un shinydashboard
+
 ### Base de datos a utilizar
 library(readr)
 Pokemon <- read_csv("Pokemon.csv")
