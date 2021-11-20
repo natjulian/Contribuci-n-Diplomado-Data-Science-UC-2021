@@ -11,7 +11,10 @@ library(readr)
 Pokemon <- read_csv("Pokemon.csv")
 
 ## Barra superior del dashboard:
-header <- dashboardHeader( )
+header <- dashboardHeader(
+  title="Pokemon Analytics",  # Titulo del dashboard
+  titleWidth=300              # Tamanio del dashboard
+)
 
 ## Menu de navegacion del dashboard:
 sidebar <- dashboardSidebar( )
@@ -26,3 +29,5 @@ ui <- dashboardPage(header, sidebar, body)
 server <- function(input, output) {}
 
 shinyApp(ui = ui, server = server)
+
+
