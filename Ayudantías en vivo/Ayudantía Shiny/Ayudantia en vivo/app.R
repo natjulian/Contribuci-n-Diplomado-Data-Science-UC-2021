@@ -60,6 +60,10 @@ sidebar <- dashboardSidebar(
 body <- dashboardBody(   
         shinyDashboardThemes(theme = "onenote"),
         tabItems(
+          tabItem(tabName = "menu1" ,
+                  h1("Tabla de datos"),
+                  fluidRow(dataTableOutput("table1"))
+          ),
           tabItem(tabName = "menu21" ,
                   h1("Grafica de dispersion por tipo de pokemon"),
                   fluidRow(highchartOutput("graf1"))
@@ -70,6 +74,19 @@ body <- dashboardBody(
 ui <- dashboardPage(header, sidebar, body)
 
 server <- function(input, output) {
+  
+  output$table1<- renderDataTable(
+    {
+      datatable(Pokemon[,-1], # Datos a mostrar
+                filter = list(position = "top"), # Posicion del buscador
+                options = list(dom="t", # Elimina un search grande de arriba
+                               #autoWidth = TRUE , # Esto hace que se ajuste el ancho
+                               pageLength = 8,  # Se muestran 8 registros por pagina
+                               scrollX = TRUE)) # Se avanza con una barra deslizante horizontal
+    }
+  )
+  
+  
   output$graf1 <- renderHighchart({
     hchart(Pokemon %>%
              filter(`Type 1`==input$select_tipo1), # Filtra por el tipo de pokemon seleccionado
