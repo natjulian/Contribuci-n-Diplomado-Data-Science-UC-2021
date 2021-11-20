@@ -21,6 +21,11 @@ header <- dashboardHeader(
                  message = HTML("Dudas? No dudes en consultar :)"), # Mensaje
                  icon = icon("question"), #icono del mensaje
                  time = substr(Sys.time(), start=12, stop=16)        # Hora que queremos que aparezca
+               )),
+  dropdownMenu(type = "notifications",
+               notificationItem(
+                 text = "Ultima ayudantia!!",
+                 icon("users")
                ))
 )
 
