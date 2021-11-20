@@ -17,7 +17,9 @@ sidebar <- dashboardSidebar( )
 
 ## Cuerpo de cada vineta del menu
 body <- dashboardBody( )
+
 ui <- dashboardPage(header, sidebar, body)
+
 server <- function(input, output) {}
 
 shinyApp(ui = ui, server = server)
