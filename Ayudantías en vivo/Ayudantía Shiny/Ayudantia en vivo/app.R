@@ -39,7 +39,12 @@ sidebar <- dashboardSidebar(
            sidebarMenu(
              id='sidebar',                           # Nombre identificador del sidebar
              menuItem('PokeTabla',# Nombre de la pestana 1 en el dash
-                      tabName = 'menu1')
+                      tabName = 'menu1'),
+             
+             menuItem('Graficos por tipo de Pokemon',# Nombre de la pestana 1 en el dash
+                      tabName = 'menu2',
+                      menuItem('Graficos de dispersion',# Nombre de la pestana 1 en el dash
+                      tabName = 'menu21', icon=icon("zoom-in", lib="glyphicon")))
            ))
 
 ## Cuerpo de cada vineta del menu
