@@ -536,7 +536,7 @@ Puede ser de interés añadir un logo a nuestra shiny app. Para ello debemos edi
 
 .chico2[
 
-```{r, echo=FALSE, eval=FALSE}
+```{r, eval=FALSE}
 
 # Barra superior del dashboard:
 header <- dashboardHeader(#<<
