@@ -17,7 +17,9 @@ header <- dashboardHeader( )
 sidebar <- dashboardSidebar( )
 
 ## Cuerpo de cada vineta del menu
-body <- dashboardBody( )
+body <- dashboardBody(   
+        shinyDashboardThemes(theme = "flat_red")
+)
 
 ui <- dashboardPage(header, sidebar, body)
 
