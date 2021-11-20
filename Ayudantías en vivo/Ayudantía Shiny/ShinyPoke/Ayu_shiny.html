@@ -1,0 +1,893 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Ayudantía 20 Noviembre</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Natalie J. - Paula M. - Javiera P." />
+    <script src="libs/header-attrs-2.8/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+
+class: left, bottom
+
+# Ayudantía 20 Noviembre
+## Diplomado en Data Science
+
+.center[
+----
+## Natalie J. - Paula M. - Javiera P.
+]
+
+
+
+
+
+&lt;style type="text/css"&gt;
+
+.remark-slide-content {
+    font-size: 25px;
+}
+
+p{
+text-align: justify;
+}
+
+.azul{
+color:#23395b ;
+}
+
+code.bold{
+}
+
+.blanco{
+color: white;
+}
+
+code.blanco{
+color: white;
+}
+
+.small{ font-size: 70% }
+
+.large{ font-size: 130% }
+
+
+tr:nth-child(odd) {background-color: #f5f5f5;}
+
+tr.high {
+  background-color: #e64964;
+  color: white;
+}
+
+td.high {
+  background-color: #e64964;
+  color: white;
+}
+th.high {
+  background-color: #e64964;
+  color: white;
+}
+
+td {
+  text-align: center;
+}
+
+.chico .remark-code{ 
+font-size: 13px;
+}
+
+.pull-left2 {
+  float: left;
+  width: 64%;
+}
+.pull-right2{
+  float: right;
+  width: 36%;
+}
+
+.chico2 .remark-code{ 
+font-size: 16px;
+}
+
+.chico3 .remark-code{ 
+font-size: 12px;
+}
+
+
+.chico4 .remark-code{ 
+font-size: 7px;
+}
+
+.chico5 .remark-code{ 
+font-size: 11px;
+}
+
+&lt;/style&gt; 
+
+
+
+---
+class: inverse, middle
+
+# Shiny ✨
+
+---
+# Recordando como crear un archivo shiny:
+
+.pull-left[ 
+
+.center[&lt;img src="shiny1.png" width="400px"&gt;]
+]
+
+.pull-right[
+
+.center[&lt;img src="shiny2.png" width="400px"&gt;]
+]
+
+---
+
+## Librerías que usaremos hoy:
+
+
+```r
+library(shiny)          # App web
+library(shinydashboard) # Para formato dashboard
+library(shinyjs)        # Para usar entorno javascript
+library(highcharter)    # Para graficos interactivos
+library(DT)             # Para tablas
+library(dplyr)          # Para manipulacion de bases de datos
+library(dashboardthemes) #Para modificar el theme de un shinydashboard
+
+### Base de datos a utilizar
+library(readr)
+Pokemon &lt;- read_csv("Pokemon.csv")
+```
+
+
+---
+class: inverse, center, middle
+## RECOMENDACIÓN
+
+### Evita utilizar caracteres con tildes, signo de pregunta ¿, símbolos y letras "especiales" en tu shiny app, puede arrojar un error de encoding muy molestoso :D
+
+---
+class: inverse, middle
+
+# Shiny Dashboard 
+
+---
+## Creando un Dashboard desde cero:
+
+
+.pull-left[
+Estructura general:
+
+```r
+## Barra superior del dashboard:
+header &lt;- dashboardHeader( )
+
+## Menu de navegacion del dashboard:
+sidebar &lt;- dashboardSidebar( )
+
+## Cuerpo de cada vineta del menu
+body &lt;- dashboardBody( )
+
+ui &lt;- dashboardPage(header, sidebar, body)
+
+server &lt;- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
+]
+
+.pull-right[&lt;img src="shiny3.png" width="450px"&gt;]
+
+---
+
+.large[**Paquete  `dashboardtheme`**]
+
+
+.pull-left[Podemos cambiar el tema predeterminado editando el "Body" de nuestro dashboard
+
+```r
+## Barra superior del dashboard:
+header &lt;- dashboardHeader( )
+
+## Menu de navegacion del dashboard:
+sidebar &lt;- dashboardSidebar( )
+
+## Cuerpo de cada vineta del menu
+body &lt;- dashboardBody(   
+*   shinyDashboardThemes(
+    theme = "flat_red")
+    )
+
+ui &lt;- dashboardPage(header, sidebar, body)
+
+server &lt;- function(input, output) {}
+
+shinyApp(ui = ui, server = server)
+```
+Elige el tema que más te guste :)
+]
+
+.pull-right[&lt;img src="shiny4.png" width="400px"&gt;
+]
+
+
+---
+.large[**Paquete  `dashboardtheme`**]
+
+Para revisar documentación de los temas ingresar [aquí](https://github.com/nik01010/dashboardthemes)
+
+.pull-left[&lt;img src="shiny5.png" width="600px"&gt;
+
+
+```r
+# Cuerpo de cada vinieta del menu
+body &lt;- dashboardBody(   
+    shinyDashboardThemes(
+*   theme = "onenote")
+    )
+```
+
+]
+
+.pull-right[.center[&lt;img src="shiny6.png" width="400px"&gt;
+]]
+
+
+
+---
+.large[**Customizando el header**]
+
+Añadiendo título al dashboard
+
+
+```r
+# Barra superior del dashboard:
+*header &lt;- dashboardHeader(
+    title="Pokemon Analytics",  # Titulo del dashboard
+    titleWidth=300              # Tamanio del dashboard
+)
+```
+
+.center[&lt;img src="shiny7.png"&gt;]
+
+---
+.large[**Customizando el header**]
+
+Añadiendo notificaciones y warnings
+
+.pull-left2[.chico3[
+
+```r
+#Barra superior del dashboard:
+header &lt;- dashboardHeader(
+    title="Pokemon Analytics",                              #Titulo del dashboard
+    titleWidth=300,                                         #Tamano del dashboard
+    
+    #Anadiendo notificaciones en el dashboard
+    dropdownMenu(type="message",                            # Menu emergente del tipo 'mensaje'
+*       messageItem(
+        from = "Las ayudantes dicen:", #'emisor del mensaje'
+        message = HTML("Dudas? No dudes en consultar :)"), # Mensaje
+        icon = icon("question"), #icono del mensaje
+        time = substr(Sys.time(), start=12, stop=16)        # Hora que queremos que aparezca
+    )),
+    
+*   dropdownMenu(type = "notifications",
+                 notificationItem(
+                     text = "Ultima ayudantia!!",
+                     icon("users")
+    )),
+    
+*   dropdownMenu(type = "tasks",
+                 badgeStatus = "success",
+                 taskItem(value = 90, color = "green",
+                          "Status Diplomado"
+    ))
+    )
+```
+]]
+
+.pull-right2[.center[&lt;img src="shiny8.png" width= "380px"&gt;]
+]
+
+---
+.large[**Customizando el sidebar**]
+
+Añadiendo una pestaña:
+
+
+```r
+# Menu de navegacion del dashboard:
+*sidebar &lt;- dashboardSidebar(
+    width = 250,                                # Tamano del sidebar
+    sidebarMenu(
+        id='sidebar',                           # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones',# Nombre de la pestana 1 en el dash
+                 tabName = 'menu1')
+    ))
+```
+
+.center[&lt;img src="shiny9.png"&gt;]
+
+
+---
+.large[**Customizando el sidebar**]
+
+Añadiendo otra pestaña:
+
+
+```r
+# Menu de navegacion del dashboard:
+*sidebar &lt;- dashboardSidebar(
+    width = 250,                                # Tamano del sidebar
+    sidebarMenu(
+        id='sidebar',                           # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones',# Nombre de la pestana 1 en el dash
+                 tabName = 'menu1'),
+        menuItem('Graficos por tipo de pokemon',# Nombre de la pestana 2 en el dash
+              tabName = 'menu2'))
+ )
+```
+
+.center[&lt;img src="shiny10.png"&gt;]
+
+---
+
+.large[**Customizando el sidebar**]
+
+Añadiendo una pestaña jerárquica:
+
+
+```r
+#Menu de navegacion del dashboard:
+*sidebar &lt;- dashboardSidebar(
+    width = 250,                                 # Tamano del sidebar
+    sidebarMenu(
+        id='sidebar',                            # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones', # Nombre de la pestana 1 en el dash
+                 tabName = 'menu1'),
+        menuItem('Graficos por tipo de pokemon', # Nombre de la pestana 2 en el dash
+              tabName = 'menu2', startExpanded = T,
+              menuItem('Grafico de dispersion', tabName="menu21", 
+                       icon = icon("zoom-in",lib = "glyphicon")))
+        )
+)
+```
+.center[&lt;img src="shiny11.png"&gt;]
+
+---
+
+.large[**Customizando el sidebar**]
+
+Añadiendo un input en el sidebar al nivel de la segunda pestaña:
+
+.pull-right2[.center[&lt;img src="shiny12.png"&gt;]]
+
+.chico[
+
+```r
+#Menu de navegacion del dashboard:
+sidebar &lt;- dashboardSidebar(
+    width = 250, #Tamanio del sidebar
+    sidebarMenu(
+        id='sidebar',                            # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones', # Nombre de la pestana 1 en el dash
+                 tabName = 'menu1'),
+        menuItem('Graficos por tipo de pokemon', # Nombre de la pestana 2 en el dash
+              tabName = 'menu2', startExpanded = T,
+              div(id = "sidebar1",
+*                 conditionalPanel("input.sidebar === ’menu21’",
+                                   selectizeInput("select_tipo1",
+                                                  "Seleccione Tipo",
+                                                  choices = unique(Pokemon$`Type 1`),
+                                                  selected = "", width = "300px",
+                                                  multiple = F))),
+              menuItem('Grafico de dispersion', tabName="menu21", 
+                       icon = icon("zoom-in",lib = "glyphicon")))
+        )
+)
+```
+]
+---
+.large[**Estructura del body**]
+
+Estructurando la pestaña "menu21":
+
+
+```r
+# Cuerpo de cada vinieta del menu
+body &lt;- dashboardBody(
+    shinyDashboardThemes(
+        theme = "onenote"),
+    tabItems(
+*       tabItem(tabName = "menu21",
+                h1("Gráficas de dispersión por tipo"),
+                fluidRow(highchartOutput("graf1"))
+    )))
+```
+
+.center[&lt;img src="shiny13.png"&gt;]
+
+---
+.large[**Estructura del body** (Estructurando la pestaña "menu21")]
+
+Definiendo el gráfico dependiendo del input "select_tipo1" en el server.
+.chico2[
+
+```r
+server &lt;- function(input, output) {
+*        output$graf1 &lt;- renderHighchart({
+        hchart(Pokemon %&gt;%
+                   filter(`Type 1`==input$select_tipo1), # Filtra por el tipo de pokemon seleccionado
+               "scatter", hcaes(x = Speed, y = Attack)) %&gt;%  # Grafico de dispersion y variables x e y
+            hc_yAxis(title = list(text = "Attack"))%&gt;% # Titulo eje y
+            hc_title(text=paste("Velocidad y Ataque de Pokemones de tipo",
+                                input$select_tipo1), # Titulo del grafico
+                     align = "center")%&gt;% 
+            hc_tooltip(pointFormat= "Attack: {point.y} &lt;br&gt;
+Speed:{point.x}" ) %&gt;% #tooltip desplegable al posicionar el raton encima de cada punto
+            hc_add_theme(hc_theme_google()) #tema a usar
+    })
+}
+```
+]
+
+.center[&lt;img src="shiny14.png"&gt;]
+
+---
+
+.large[**Estructura del body**]
+
+Estructurando la pestaña "menu1":
+
+
+```r
+#Cuerpo de cada vinieta del menu
+body &lt;- dashboardBody(
+    shinyDashboardThemes(
+        theme = "onenote"),
+    tabItems(
+*       tabItem(tabName = "menu1",
+                h1("Tabla de datos"),
+                fluidRow(dataTableOutput("table1"))
+        ),
+        tabItem(tabName = "menu21",
+                h1("Gráficas de dispersión por tipo"),
+                fluidRow(highchartOutput("graf1")))
+    )
+)
+```
+
+---
+
+.large[**Estructura del body** (Estructurando la pestaña "menu1")]
+
+Definiendo la tabla "table 1" en el server:
+
+
+
+.pull-left2[.chico5[
+
+```r
+server &lt;- function(input, output) {
+*   output$table1 &lt;- renderDataTable({
+        datatable(Pokemon[,-1], # Datos a mostrar
+                  filter = list(position = "top"), # Posicion del buscador
+                  options = list(dom="t", # Elimina un search grande de arriba
+                                 #autoWidth = TRUE , # Esto hace que se ajuste el ancho
+                                 pageLength = 8,  # Se muestran 8 registros por pagina
+                                 scrollX = TRUE)) # Se avanza con una barra deslizante horizontal
+                                 })
+    
+    output$graf1 &lt;- renderHighchart({
+        hchart(Pokemon %&gt;%
+                   filter(`Type 1`==input$select_tipo1), # Filtra por tipo de pokemon seleccionado
+               "scatter",                        # Grafico de dispersion
+               hcaes(x = Speed, y = Attack)) %&gt;% # variables x e y
+            hc_yAxis(title = list(text = "Attack"))%&gt;% #titulo eje y
+            hc_title(text=paste("Velocidad y Ataque de Pokemones de tipo",
+                                input$select_tipo1), # Titulo del grafico
+                     align = "center")%&gt;% 
+            hc_tooltip(pointFormat= "Attack: {point.y} &lt;br&gt;
+Speed:{point.x}" ) %&gt;% # tooltip desplegable al posicionar el raton encima de cada punto
+            hc_add_theme(hc_theme_google()) #tema a usar
+    })
+}
+```
+]]
+
+.pull-right2[.center[&lt;img src="shiny15.png" width="390px"&gt;]]
+
+
+---
+
+.large[**Extra: Añadiendo logo al header**]
+
+Puede ser de interés añadir un logo a nuestra shiny app. Para ello debemos editar el título con los siguientes comandos:
+
+
+.chico2[
+
+
+]
+
+.pull-right2[ .center[&lt;img src="logo_header.jpeg" width="390px"&gt;]
+]
+
+.pull-left2[ La personalización usada corresponde a ajustes CSS
+  - a(): Crea un enlace a una pág web. 
+  - img(): Añade una imagen.
+]
+
+
+---
+
+.large[**Extra: Añadiendo vídeo de Youtube**]
+
+Puede ser de interés añadir un vídeo de Youtube a la app. Lo primero sería 
+añadir esta pestaña al menú de navegación:
+
+
+.chico2[
+
+```r
+#Menu de navegacion del dashboard:
+sidebar &lt;- dashboardSidebar(
+    width = 250, #Tamanio del sidebar
+    sidebarMenu(
+        id='sidebar', # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones', # Nombre de la pestana 1 en el dash
+                 tabName = 'menu1'),
+        menuItem('Graficos por tipo de pokemon', # Nombre de la pestana 2 en el dash
+                 tabName = 'menu2', startExpanded = T,
+                 div(id = "sidebar1",
+                     conditionalPanel("input.sidebar === ’menu21’",
+                                      selectizeInput("select_tipo1",
+                                                     "Seleccione Tipo",
+                                                     choices = unique(Pokemon$`Type 1`),
+                                                     selected = "", width = "300px",
+                                                     multiple = F))),
+                 menuItem('Grafico de dispersion', tabName="menu21",
+                          icon = icon("zoom-in",lib = "glyphicon"))),
+*       menuItem('PokeRap',
+                 tabName = 'menu3')
+    )
+)
+```
+]
+
+---
+
+Y luego el vídeo lo añadimos al cuerpo de esta pestaña. En este caso donde 
+pondríamos el tipo de output colocamos **HTML**. Y dentro se pone el código HTML 
+para compartir que entrega la misma plataforma Youtube.
+
+.pull-left2[.chico3[
+
+```r
+#Cuerpo de cada vinieta del menu
+body &lt;- dashboardBody(
+    shinyDashboardThemes(
+        theme = "onenote"),
+    tabItems(
+        tabItem(tabName = "menu1",
+                h1("Tabla de datos"),
+                fluidRow(dataTableOutput("table1"))
+        ),
+        tabItem(tabName = "menu21",
+                h1("Graficas de dispersion por tipo"),
+                fluidRow(highchartOutput("graf1"))),
+*       tabItem(tabName = "menu3",
+                h1("Te los sabes todos?"),
+                fluidRow(HTML('&lt;iframe width="560" 
+                              height="315" 
+                              src="https://www.youtube.com/embed/cAXLDCI5voM" 
+                              title="YouTube video player" frameborder="0" 
+                              allow="accelerometer; autoplay; clipboard-write; 
+                              encrypted-media; gyroscope; 
+                              picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;')
+                )
+                ))
+)
+```
+]]
+
+.pull-right2[ .center[&lt;img src="shiny19.png" width="390px"&gt;]
+]
+
+---
+
+.large[**Extra: Añadiendo vídeo de Youtube**]
+
+.pull-left2[ .center[&lt;img src="shiny16.png" width="390px"&gt;]
+]
+
+.pull-right2[ .center[&lt;img src="shiny18.png" width="390px"&gt;]
+]
+
+.pull-left2[ .center[&lt;img src="shiny17.png" width="390px"&gt;]
+]
+
+
+---
+## Material complementario:
+
+- https://shiny.rstudio.com/images/shiny-cheatsheet.pdf
+
+
+- https://shiny.rstudio.com/gallery/
+
+
+- https://jkunst.com/highcharter/articles/shiny.html
+
+- http://jkunst.com/LatinR-2019-Highcharter-taller/slides/#1
+
+
+
+---
+.large[**Código final**]
+
+
+.pull-left[.chico4[
+
+```r
+library(shiny) #App web
+library(shinydashboard) #Para formato dashboard
+library(shinyjs) #Para usar entorno javascript
+library(highcharter) #Para graficos interactivos
+library(DT) #Para tablas
+library(dplyr) #Para manipulacion de bases de datos
+library(dashboardthemes) #Para modificar el theme de un shinydashboard
+
+###Base de datos a utilizar
+library(readr)
+
+Pokemon &lt;- read_csv("Pokemon.csv")
+
+#Barra superior del dashboard:
+header &lt;- dashboardHeader(
+    title= a(href='https://www.pokemon.com/el/',
+             img(src='https://upload.wikimedia.org/wikipedia/commons/9/98/International_Pok%C3%A9mon_logo.svg',
+                 width='200px',height='50px')), # Titulo del dashboard con logo
+    titleWidth=300, #Tamanio del dashboard
+    #Anadiendo notificaciones en el dashboard
+    dropdownMenu(type="message", #Menu emergente del tipo 'mensaje'
+                 messageItem(
+                     from = "Las ayudantes dicen:", #'emisor del mensaje'
+                     message = HTML("Dudas? No dudes en consultar :)"), #mensaje
+                     icon = icon("question"), #icono del mensaje
+                     time = substr(Sys.time(), start=12, stop=16) #hora que queremos que aparezca
+                 )),
+    dropdownMenu(type = "notifications",
+                 notificationItem(
+                     text = "Ultima ayudantia!!",
+                     icon("users")
+                 )),
+    dropdownMenu(type = "tasks", badgeStatus = "success",
+                 taskItem(value = 90, color = "green",
+                          "Status Diplomado"
+                 ))
+)
+#Menu de navegacion del dashboard:
+sidebar &lt;- dashboardSidebar(
+    width = 250, #Tamanio del sidebar
+    sidebarMenu(
+        id='sidebar', # Nombre identificador del sidebar
+        menuItem('Tabla con datos de pokemones', # Nombre de la pestana 1 en el dash
+                 tabName = 'menu1'),
+        menuItem('Graficos por tipo de pokemon', # Nombre de la pestana 2 en el dash
+                 tabName = 'menu2', startExpanded = T,
+                 div(id = "sidebar1",
+                     conditionalPanel("input.sidebar === ’menu21’",
+                                      selectizeInput("select_tipo1",
+                                                     "Seleccione Tipo",
+                                                     choices = unique(Pokemon$`Type 1`),
+                                                     selected = "", width = "300px",
+                                                     multiple = F))),
+                 menuItem('Grafico de dispersion', tabName="menu21",
+                          icon = icon("zoom-in",lib = "glyphicon"))),
+        menuItem('PokeRap',
+                 tabName = 'menu3')
+    )
+)
+```
+]]
+
+
+.pull-right[.chico4[
+
+```r
+#Cuerpo de cada vinieta del menu
+body &lt;- dashboardBody(
+    shinyDashboardThemes(
+        theme = "onenote"),
+    tabItems(
+        tabItem(tabName = "menu1",
+                h1("Tabla de datos"),
+                fluidRow(dataTableOutput("table1"))
+        ),
+        tabItem(tabName = "menu21",
+                h1("Graficas de dispersion por tipo"),
+                fluidRow(highchartOutput("graf1"))),
+        tabItem(tabName = "menu3",
+                h1("Te los sabes todos?"),
+                fluidRow(HTML('&lt;iframe width="560" 
+                              height="315" 
+                              src="https://www.youtube.com/embed/cAXLDCI5voM" 
+                              title="YouTube video player" 
+                              frameborder="0" 
+                              allow="accelerometer; 
+                              autoplay; clipboard-write; 
+                              encrypted-media; 
+                              gyroscope; 
+                              picture-in-picture" 
+                              allowfullscreen&gt;&lt;/iframe&gt;')
+                )
+                ))
+)
+
+ui &lt;- dashboardPage(header, sidebar, body)
+server &lt;- function(input, output) {
+    output$table1 &lt;- renderDataTable({
+        datatable(Pokemon[,-1], # Datos a mostrar
+                  filter = list(position = "top"), # Posicion del buscador
+                  options = list(dom="t", # Elimina un search grande de arriba
+                                 #autoWidth = TRUE , #esto hace que se ajuste el ancho
+                                 pageLength = 8, #Se muestran 8 registros por pagina
+                                 scrollX = TRUE)) # Se avanza con una barra deslizante horizontal
+    })
+    
+    output$graf1 &lt;- renderHighchart({
+        hchart(Pokemon %&gt;%
+                   filter(`Type 1`==input$select_tipo1), # Filtra por el tipo de pokemon seleccionado
+               "scatter", hcaes(x = Speed, y = Attack)) %&gt;%  # Grafico de dispersion y variables x e y
+            hc_yAxis(title = list(text = "Attack"))%&gt;% #titulo eje y
+            hc_title(text=paste("Velocidad y Ataque de Pokemones de tipo", 
+                                input$select_tipo1), # Titulo del grafico
+                     align = "center")%&gt;% 
+            hc_tooltip(pointFormat= "Attack: {point.y} &lt;br&gt;
+Speed:{point.x}" ) %&gt;% # tooltip desplegable al posicionar el raton encima de cada punto
+            hc_add_theme(hc_theme_google()) #tema a usar
+    })
+    
+}
+
+shinyApp(ui = ui, server = server)
+```
+]]
+
+---
+class: inverse, center, middle
+
+# ¡Gracias :D y éxito! 
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false,
+"ratio": "16:9"
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
