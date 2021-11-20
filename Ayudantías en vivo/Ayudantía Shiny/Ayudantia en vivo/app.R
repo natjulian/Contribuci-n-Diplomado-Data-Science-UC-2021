@@ -61,14 +61,28 @@ body <- dashboardBody(
         shinyDashboardThemes(theme = "onenote"),
         tabItems(
           tabItem(tabName = "menu21" ,
-                  h1("Grafica de dispersion por tipo de pokemon")
+                  h1("Grafica de dispersion por tipo de pokemon"),
+                  fluidRow(highchartOutput("graf1"))
                   )
         )
 )
 
 ui <- dashboardPage(header, sidebar, body)
 
-server <- function(input, output) {}
+server <- function(input, output) {
+  output$graf1 <- renderHighchart({
+    hchart(Pokemon %>%
+             filter(`Type 1`==input$select_tipo1), # Filtra por el tipo de pokemon seleccionado
+           "scatter", hcaes(x = Speed, y = Attack)) %>%  # Grafico de dispersion y variables x e y
+      hc_yAxis(title = list(text = "Attack"))%>% # Titulo eje y
+      hc_title(text=paste("Velocidad y Ataque de Pokemones de tipo",
+                          input$select_tipo1), # Titulo del grafico
+               align = "center")%>% 
+      hc_tooltip(pointFormat= "Attack: {point.y} <br>
+Speed:{point.x}" ) %>% #tooltip desplegable al posicionar el raton encima de cada punto
+      hc_add_theme(hc_theme_google()) #tema a usar
+  })
+}
 
 shinyApp(ui = ui, server = server)
 
