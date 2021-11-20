@@ -34,7 +34,13 @@ header <- dashboardHeader(
                )))
 
 ## Menu de navegacion del dashboard:
-sidebar <- dashboardSidebar( )
+sidebar <- dashboardSidebar(
+           width=250,
+           sidebarMenu(
+             id='sidebar',                           # Nombre identificador del sidebar
+             menuItem('PokeTabla',# Nombre de la pestana 1 en el dash
+                      tabName = 'menu1')
+           ))
 
 ## Cuerpo de cada vineta del menu
 body <- dashboardBody(   
