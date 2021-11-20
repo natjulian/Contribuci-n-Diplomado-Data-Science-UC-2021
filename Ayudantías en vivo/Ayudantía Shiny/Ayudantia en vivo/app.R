@@ -26,6 +26,11 @@ header <- dashboardHeader(
                notificationItem(
                  text = "Ultima ayudantia!!",
                  icon("users")
+               )),
+  dropdownMenu(type = "tasks",
+               badgeStatus = "success",
+               taskItem(value = 90, color = "green",
+                        "Status Diplomado"
                ))
 )
 
