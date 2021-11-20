@@ -34,22 +34,36 @@ header <- dashboardHeader(
                )))
 
 ## Menu de navegacion del dashboard:
+
 sidebar <- dashboardSidebar(
-           width=250,
-           sidebarMenu(
-             id='sidebar',                           # Nombre identificador del sidebar
-             menuItem('PokeTabla',# Nombre de la pestana 1 en el dash
-                      tabName = 'menu1'),
-             
-             menuItem('Graficos por tipo de Pokemon',# Nombre de la pestana 1 en el dash
-                      tabName = 'menu2',
-                      menuItem('Graficos de dispersion',# Nombre de la pestana 1 en el dash
-                      tabName = 'menu21', icon=icon("zoom-in", lib="glyphicon")))
-           ))
+  width = 250, #Tamanio del sidebar
+  sidebarMenu(
+    id='sidebar',                            # Nombre identificador del sidebar
+    menuItem('Tabla con datos de pokemones', # Nombre de la pestana 1 en el dash
+             tabName = 'menu1'),
+    menuItem('Graficos por tipo de pokemon', # Nombre de la pestana 2 en el dash
+             tabName = 'menu2', startExpanded = T,
+             div(id = "sidebar1",
+                 conditionalPanel("input.sidebar === 'menu21'",
+                                  selectizeInput("select_tipo1",
+                                                 "Seleccione Tipo",
+                                                 choices = unique(Pokemon$`Type 1`),
+                                                 selected = "", width = "300px",
+                                                 multiple = F))),
+             menuItem('Grafico de dispersion', tabName="menu21", 
+                      icon = icon("zoom-in",lib = "glyphicon")))
+  )
+)
+
 
 ## Cuerpo de cada vineta del menu
 body <- dashboardBody(   
-        shinyDashboardThemes(theme = "onenote")
+        shinyDashboardThemes(theme = "onenote"),
+        tabItems(
+          tabItem(tabName = "menu21" ,
+                  h1("Grafica de dispersion por tipo de pokemon")
+                  )
+        )
 )
 
 ui <- dashboardPage(header, sidebar, body)
