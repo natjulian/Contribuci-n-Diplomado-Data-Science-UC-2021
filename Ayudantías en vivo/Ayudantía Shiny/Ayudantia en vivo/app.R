@@ -13,7 +13,15 @@ Pokemon <- read_csv("Pokemon.csv")
 ## Barra superior del dashboard:
 header <- dashboardHeader(
   title="Pokemon Analytics",  # Titulo del dashboard
-  titleWidth=300              # Tamanio del dashboard
+  titleWidth=300,              # Tamanio del dashboard
+  #Anadiendo notificaciones en el dashboard
+  dropdownMenu(type="message",                            # Menu emergente del tipo 'mensaje'
+               messageItem(
+                 from = "Las ayudantes dicen:", #'emisor del mensaje'
+                 message = HTML("Dudas? No dudes en consultar :)"), # Mensaje
+                 icon = icon("question"), #icono del mensaje
+                 time = substr(Sys.time(), start=12, stop=16)        # Hora que queremos que aparezca
+               ))
 )
 
 ## Menu de navegacion del dashboard:
