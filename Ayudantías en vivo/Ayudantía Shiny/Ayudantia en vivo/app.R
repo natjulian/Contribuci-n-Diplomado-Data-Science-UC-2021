@@ -31,8 +31,7 @@ header <- dashboardHeader(
                badgeStatus = "success",
                taskItem(value = 90, color = "green",
                         "Status Diplomado"
-               ))
-)
+               )))
 
 ## Menu de navegacion del dashboard:
 sidebar <- dashboardSidebar( )
